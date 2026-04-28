@@ -1,6 +1,5 @@
 import streamlit as st
 
-
 def render_sidebar():
     with st.sidebar:
 
@@ -14,6 +13,33 @@ def render_sidebar():
                 </div>
             </div>
         """, unsafe_allow_html=True)
+
+        # ---------- MEETING SELECT (TOP) ----------
+        meetings = st.session_state.get("meetings", [])
+
+        if meetings:
+            meeting_names = st.session_state.get("meeting_names", {})
+
+            # Build display options with "All Meetings" at top
+            named_options = [meeting_names.get(m, m) for m in meetings]
+            options = ["🗂️ All Meetings"] + named_options
+
+            selected_name = st.selectbox("📂 Select Meeting", options)
+
+            if selected_name == "🗂️ All Meetings":
+                st.session_state.selected_meeting = "ALL"
+            else:
+                # Map display name → meeting_id
+                selected_id = [
+                    m for m in meetings
+                    if meeting_names.get(m, m) == selected_name
+                ][0]
+                st.session_state.selected_meeting = selected_id
+
+        else:
+            st.info("📥 Upload a meeting to begin")
+
+        st.divider()
 
         # ---------- SETTINGS ----------
         st.markdown("### ⚙️ Settings")
@@ -63,12 +89,13 @@ def render_sidebar():
         st.markdown("### 📈 Session Stats")
 
         col1, col2 = st.columns(2)
-        # Use a placeholder so app.py can update it AFTER query_count increments
         query_count_placeholder = col1.empty()
         col2.metric("Bookmarks", len(st.session_state.get("bookmarks", [])))
 
-        # Render current count now (will be overwritten by app.py after increment)
-        query_count_placeholder.metric("Queries", st.session_state.get("query_count", 0))
+        query_count_placeholder.metric(
+            "Queries",
+            st.session_state.get("query_count", 0)
+        )
 
         st.divider()
 

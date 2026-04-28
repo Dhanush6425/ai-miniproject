@@ -12,7 +12,10 @@ load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
 
 @st.cache_resource
 def load_models():
-    embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    embedding = HuggingFaceEmbeddings(
+    model_name="all-MiniLM-L6-v2",
+    encode_kwargs={"batch_size": 32}
+)
 
     db = Chroma(
     persist_directory=str(DB_PATH),

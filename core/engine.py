@@ -1,20 +1,9 @@
-# core/engine.py
-
-from core.context import get_uploaded_context
-
 def run_query(query, query_type, top_k, retriever, llm, session):
-    
+
     # ---------- CONTEXT ----------
-    if session.get("upload_mode") and session.get("uploaded_meetings"):
-        context = get_uploaded_context(
-            query,
-            session.get("selected_meeting", "All Meetings"),
-            session.get("uploaded_meetings"),
-            top_k
-        )
-    else:
-        docs = retriever.invoke(query)
-        context = "\n\n".join([d.page_content for d in docs])
+    docs = retriever.invoke(query)
+
+    context = "\n\n".join([d.page_content for d in docs])
 
     # ---------- PROMPT ----------
     prompt = f"""
